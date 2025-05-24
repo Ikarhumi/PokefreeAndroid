@@ -1430,8 +1430,7 @@ public final class Tools {
     }
 
     public static boolean isDemoProfile(Context ctx){
-        MinecraftAccount currentProfile = PojavProfile.getCurrentProfileContent(ctx, null);
-        return currentProfile != null && currentProfile.isDemo();
+        return false;
     }
 
     public static boolean isLocalProfile(Context ctx){

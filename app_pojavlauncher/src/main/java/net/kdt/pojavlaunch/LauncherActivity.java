@@ -137,11 +137,6 @@ public class LauncherActivity extends BaseActivity {
                     isOlderThan13 = DateUtils.dateBefore(DateUtils.parseReleaseDate(mcVersion.releaseTime), 2012, 6, 22);
                 } catch (ParseException ignored) {}
             }
-
-            if (isOlderThan13) {
-                Toast.makeText(this, R.string.toast_not_available_demo, Toast.LENGTH_LONG).show();
-                return false;
-            }
         }
 
         new MinecraftDownloader().start(
