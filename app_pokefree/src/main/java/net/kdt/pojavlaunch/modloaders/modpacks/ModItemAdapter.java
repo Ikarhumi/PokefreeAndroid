@@ -329,6 +329,11 @@ public class ModItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         private void setInstallEnabled(boolean enabled) {
             mInstallEnabled = enabled;
+            if (mInstallEnabled)
+            {
+                LauncherProfiles.mainProfileJson.profiles = new HashMap<>();
+                LauncherProfiles.write();
+            }
             updateInstallButtonState();
         }
 
