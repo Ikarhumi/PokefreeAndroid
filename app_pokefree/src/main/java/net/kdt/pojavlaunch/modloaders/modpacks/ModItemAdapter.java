@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kdt.SimpleArrayAdapter;
@@ -23,6 +24,7 @@ import com.kdt.SimpleArrayAdapter;
 import net.kdt.pojavlaunch.PojavApplication;
 import net.kdt.pojavlaunch.R;
 import net.kdt.pojavlaunch.Tools;
+import net.kdt.pojavlaunch.fragments.MainMenuFragment;
 import net.kdt.pojavlaunch.modloaders.modpacks.api.ModpackApi;
 import net.kdt.pojavlaunch.modloaders.modpacks.imagecache.ImageReceiver;
 import net.kdt.pojavlaunch.modloaders.modpacks.imagecache.ModIconCache;
@@ -177,11 +179,15 @@ public class ModItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mExtendedButton = mExtendedLayout.findViewById(R.id.mod_extended_select_version_button);
                     mExtendedSpinner = mExtendedLayout.findViewById(R.id.mod_extended_version_spinner);
                     mExtendedErrorTextView = mExtendedLayout.findViewById(R.id.mod_extended_error_textview);
-
-                    mExtendedButton.setOnClickListener(v1 -> mModpackApi.handleInstallation(
+                    mExtendedButton.setOnClickListener(v1 ->
+                            mModpackApi.handleInstallation(
                             mExtendedButton.getContext().getApplicationContext(),
                             mModDetail,
-                            mExtendedSpinner.getSelectedItemPosition()));
+                            mExtendedSpinner.getSelectedItemPosition(),
+                            () -> Tools.runOnUiThread(() -> mSearchResultCallback.onInstallFinished()),
+                            () -> Tools.runOnUiThread(() -> mSearchResultCallback.onInstallBeginning(true)),
+                            () -> Tools.runOnUiThread(() -> mSearchResultCallback.onInstallBeginning(false))));
+
                     mExtendedSpinner.setAdapter(mLoadingAdapter);
                 } else {
                     if(isExtended()) closeDetailedView();
@@ -329,11 +335,7 @@ public class ModItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         private void setInstallEnabled(boolean enabled) {
             mInstallEnabled = enabled;
-            if (mInstallEnabled)
-            {
-                LauncherProfiles.mainProfileJson.profiles = new HashMap<>();
-                LauncherProfiles.write();
-            }
+
             updateInstallButtonState();
         }
 
@@ -413,5 +415,9 @@ public class ModItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         int ERROR_NO_RESULTS = 1;
         void onSearchFinished();
         void onSearchError(int error);
+
+        void onInstallBeginning(boolean isInstalling);
+
+        void onInstallFinished();
     }
 }

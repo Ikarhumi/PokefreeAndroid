@@ -82,6 +82,10 @@ public class LauncherActivity extends BaseActivity {
         return false;
     };
 
+    public ImageButton getSettingsButton() {
+        return mSettingsButton;
+    }
+
     /* Listener for the auth method selection screen */
     private final ExtraListener<Boolean> mSelectAuthMethod = (key, value) -> {
         Fragment fragment = getSupportFragmentManager().findFragmentById(mFragmentView.getId());

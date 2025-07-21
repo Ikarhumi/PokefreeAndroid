@@ -10,7 +10,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -19,7 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.kdt.pojavlaunch.LauncherActivity;
 import net.kdt.pojavlaunch.R;
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.modloaders.modpacks.ModItemAdapter;
 import net.kdt.pojavlaunch.modloaders.modpacks.api.CommonApi;
 import net.kdt.pojavlaunch.modloaders.modpacks.api.ModpackApi;
@@ -42,6 +46,7 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
 
     private EditText mSearchEditText;
     private ImageButton mFilterButton;
+
     private RecyclerView mRecyclerview;
     private ModItemAdapter mModItemAdapter;
     private ProgressBar mSearchProgressBar;
@@ -50,6 +55,7 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
 
     private ModpackApi modpackApi;
 
+    private boolean isInstalling = false;
     private final SearchFilters mSearchFilters;
 
     public SearchModFragment(){
@@ -85,6 +91,18 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
 
         mRecyclerview.addOnScrollListener(mOverlayPositionListener);
 
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if(modpackApi != null && isInstalling) {
+                    Toast.makeText(requireContext(), "Mise à jour en cours. Veuillez patienter...", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                setEnabled(false);
+                requireActivity().onBackPressed();
+            }
+        });
         mSearchEditText.setOnEditorActionListener((v, actionId, event) -> {
             searchMods(mSearchEditText.getText().toString());
             mSearchEditText.clearFocus();
@@ -114,6 +132,32 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
     public void onSearchFinished() {
         mSearchProgressBar.setVisibility(View.GONE);
         mStatusTextView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onInstallBeginning(boolean isInstalling) {
+        this.isInstalling = isInstalling;
+        LauncherActivity activity = (LauncherActivity) getActivity();
+        if(activity != null){
+            ImageButton settingsButton = activity.getSettingsButton();
+            settingsButton.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onInstallFinished() {
+        Fragment currentFragment = requireActivity()
+                .getSupportFragmentManager()
+                .findFragmentById(R.id.container_fragment);
+
+        if (currentFragment instanceof SearchModFragment) {
+            LauncherActivity activity = (LauncherActivity) getActivity();
+            if(activity != null){
+                ImageButton settingsButton = activity.getSettingsButton();
+                settingsButton.setVisibility(View.VISIBLE);
+            }
+            Tools.swapFragment(requireActivity(), MainMenuFragment.class, MainMenuFragment.TAG, null);
+        }
     }
 
     @Override
