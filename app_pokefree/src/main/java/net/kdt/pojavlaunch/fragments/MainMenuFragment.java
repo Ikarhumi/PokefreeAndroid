@@ -20,17 +20,25 @@ import net.kdt.pojavlaunch.R;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
+import net.kdt.pojavlaunch.modloaders.modpacks.api.CommonApi;
+import net.kdt.pojavlaunch.modloaders.modpacks.api.ModpackApi;
+import net.kdt.pojavlaunch.modloaders.modpacks.models.SearchFilters;
+import net.kdt.pojavlaunch.modloaders.modpacks.models.SearchResult;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper;
 import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
 import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class MainMenuFragment extends Fragment {
     public static final String TAG = "MainMenuFragment";
 
     private mcVersionSpinner mVersionSpinner;
+    private boolean hasUpdate = false;
 
     public MainMenuFragment(){
         super(R.layout.fragment_launcher);
@@ -51,7 +59,7 @@ public class MainMenuFragment extends Fragment {
         mDiscordButton.setOnClickListener(v -> Tools.openURL(requireActivity(), getString(R.string.discord_invite)));
         mEditProfileButton.setOnClickListener(v -> mVersionSpinner.openProfileEditor(requireActivity()));
 
-        if (LauncherProfiles.mainProfileJson.profiles.isEmpty())
+        if (LauncherProfiles.mainProfileJson.profiles.isEmpty() || isNewUpdate())
         {
             mPlayButton.setText(R.string.update);
             mPlayButton.setOnClickListener(v -> Tools.swapFragment((FragmentActivity) getContext(), SearchModFragment.class,
@@ -88,6 +96,47 @@ public class MainMenuFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mVersionSpinner.reloadProfiles();
+    }
+
+    public boolean isNewUpdate()
+    {
+        return true;
+    }
+
+    private void checkForModUpdate() {
+        ModpackApi modpackApi = new CommonApi(getString(R.string.curseforge_api_key));
+
+        SearchFilters filters = new SearchFilters();
+        filters.isModpack = true;
+        filters.name = "Pokefree";
+
+        SearchResult result = modpackApi.searchMod(filters);
+            if (result == null || result == null || result.totalResultCount == 0) {
+                return;
+            }
+
+            String latestVersion = result.results[0].toString();
+
+            // Exemple de comparaison : tu peux adapter cette version locale
+            String localVersion = getInstalledModVersion();
+
+            hasUpdate = !latestVersion.equals(localVersion);
+
+            // Reconfigurer le bouton maintenant qu’on a l’info
+            //updatePlayButton();
+    }
+
+
+    private String getInstalledModVersion() {
+        File versionFile = new File(getCurrentProfileDirectory(), "pokefree-version.txt");
+        if (versionFile.exists()) {
+            try {
+                return new BufferedReader(new FileReader(versionFile)).readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "unknown";
     }
 
     private void runInstallerWithConfirmation(boolean isCustomArgs) {
