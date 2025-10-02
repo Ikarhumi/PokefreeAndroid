@@ -22,21 +22,19 @@
             />
 
         <Preference
-            android:key="control_screen_setting"
-            android:title="@string/preference_control_title"
-            android:summary="@string/preference_control_description"
-            android:fragment="net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceControlFragment"
-            android:icon="@drawable/ic_menu_custom_controls"
-            />
-
-        <Preference
             android:key="java_screen_setting"
             android:title="@string/preference_java_title"
             android:summary="@string/preference_java_description"
             android:fragment="net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceJavaFragment"
             android:icon="@drawable/ic_setting_java_runtime"
             />
-
+        <Preference
+            android:key="controller_screen_settings"
+            android:title="@string/preference_category_controller_settings"
+            android:summary="@string/preference_control_description"
+            android:fragment="net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceControlFragment"
+            android:icon="@drawable/ic_setting_control_scale"
+            />
         <Preference
             android:key="misc_screen_setting"
             android:title="@string/preference_misc_title"

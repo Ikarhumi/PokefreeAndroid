@@ -12,8 +12,10 @@ import net.kdt.pojavlaunch.value.launcherprofiles.LauncherProfiles;
 import net.kdt.pojavlaunch.value.launcherprofiles.MinecraftProfile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public class ModpackInstaller {
@@ -44,6 +46,12 @@ public class ModpackInstaller {
                 return null;
             });
 
+            // Supprimer complètement le dossier custom_instances
+            File customInstancesDir = new File(Tools.DIR_GAME_HOME, "custom_instances");
+            if (customInstancesDir.exists()) {
+                deleteRecursively(customInstancesDir);
+            }
+
             // Install the modpack
             modLoaderInfo = installFunction.installModpack(modpackFile, new File(Tools.DIR_GAME_HOME, "custom_instances/"+modpackName));
 
@@ -66,7 +74,21 @@ public class ModpackInstaller {
         LauncherProfiles.mainProfileJson.profiles.put(modpackName, profile);
         LauncherProfiles.write();
 
+        File versionFile = new File(Tools.DIR_GAME_HOME, "pokefree-version.txt");
+        try (FileWriter writer = new FileWriter(versionFile)) {
+            writer.write(modDetail.versionNames[selectedVersion]);
+        }
+
         return modLoaderInfo;
+    }
+
+    private static void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            for (File subFile : Objects.requireNonNull(file.listFiles())) {
+                deleteRecursively(subFile);
+            }
+        }
+        file.delete();
     }
 
     interface InstallFunction {

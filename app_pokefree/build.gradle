@@ -151,6 +151,7 @@ android {
             // debuggable = true
             resValue 'string', 'storageProviderAuthorities', 'net.kdt.pojavlaunch.scoped.gamefolder'
             resValue 'string', 'application_package', 'net.kdt.pojavlaunch'
+            signingConfig signingConfigs.debug
         }
         gplay {
             initWith release

@@ -28,13 +28,14 @@
         android:id="@+id/mod_extended_select_version_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="@string/generic_install"
         android:layout_marginHorizontal="@dimen/padding_large"
         android:layout_marginTop="@dimen/padding_moderate"
         android:layout_marginBottom="@dimen/padding_large"
+        android:enabled="false"
+        android:text="@string/generic_install"
 
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mod_extended_version_spinner" />
+        app:layout_constraintTop_toBottomOf="@id/mod_extended_version_spinner"
+        tools:layout_editor_absoluteX="21dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

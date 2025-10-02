@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.math.MathUtils;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -90,8 +91,7 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
         mRecyclerview.setAdapter(mModItemAdapter);
 
         mRecyclerview.addOnScrollListener(mOverlayPositionListener);
-
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+                requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(modpackApi != null && isInstalling) {
@@ -118,6 +118,7 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
         });
         mFilterButton.setOnClickListener(v -> displayFilterDialog());
         mSearchEditText.setText("Pokefree");
+        mSearchEditText.setEnabled(false);
         searchMods("Pokefree");
     }
 
@@ -146,18 +147,16 @@ public class SearchModFragment extends Fragment implements ModItemAdapter.Search
 
     @Override
     public void onInstallFinished() {
-        Fragment currentFragment = requireActivity()
-                .getSupportFragmentManager()
-                .findFragmentById(R.id.container_fragment);
-
-        if (currentFragment instanceof SearchModFragment) {
-            LauncherActivity activity = (LauncherActivity) getActivity();
-            if(activity != null){
-                ImageButton settingsButton = activity.getSettingsButton();
-                settingsButton.setVisibility(View.VISIBLE);
+        try {
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                Tools.swapFragment(activity, MainMenuFragment.class, MainMenuFragment.TAG, null);
             }
-            Tools.swapFragment(requireActivity(), MainMenuFragment.class, MainMenuFragment.TAG, null);
-        }
+    }
+    catch (Exception e)
+    {
+        e.printStackTrace();
+    }
     }
 
     @Override

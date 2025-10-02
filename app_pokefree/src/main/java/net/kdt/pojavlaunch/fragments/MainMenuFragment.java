@@ -11,17 +11,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.kdt.mcgui.mcVersionSpinner;
 
+import net.kdt.pojavlaunch.PojavApplication;
 import net.kdt.pojavlaunch.R;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.extra.ExtraConstants;
 import net.kdt.pojavlaunch.extra.ExtraCore;
+import net.kdt.pojavlaunch.modloaders.modpacks.SelfReferencingFuture;
 import net.kdt.pojavlaunch.modloaders.modpacks.api.CommonApi;
 import net.kdt.pojavlaunch.modloaders.modpacks.api.ModpackApi;
+import net.kdt.pojavlaunch.modloaders.modpacks.models.ModDetail;
 import net.kdt.pojavlaunch.modloaders.modpacks.models.SearchFilters;
 import net.kdt.pojavlaunch.modloaders.modpacks.models.SearchResult;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
@@ -50,7 +54,6 @@ public class MainMenuFragment extends Fragment {
         Button mDiscordButton = view.findViewById(R.id.discord_button);
         Button mShareLogsButton = view.findViewById(R.id.share_logs_button);
         Button mOpenDirectoryButton = view.findViewById(R.id.open_files_button);
-
         ImageButton mEditProfileButton = view.findViewById(R.id.edit_profile_button);
         Button mPlayButton = view.findViewById(R.id.play_button);
         mVersionSpinner = view.findViewById(R.id.mc_version_spinner);
@@ -58,30 +61,35 @@ public class MainMenuFragment extends Fragment {
         mNewsButton.setOnClickListener(v -> Tools.openURL(requireActivity(), Tools.URL_HOME));
         mDiscordButton.setOnClickListener(v -> Tools.openURL(requireActivity(), getString(R.string.discord_invite)));
         mEditProfileButton.setOnClickListener(v -> mVersionSpinner.openProfileEditor(requireActivity()));
-
-        if (LauncherProfiles.mainProfileJson.profiles.isEmpty() || isNewUpdate())
-        {
-            mPlayButton.setText(R.string.update);
-            mPlayButton.setOnClickListener(v -> Tools.swapFragment((FragmentActivity) getContext(), SearchModFragment.class,
-                    SearchModFragment.TAG, null));
-        }
-        else {
-            mPlayButton.setText(R.string.main_play);
-            mPlayButton.setOnClickListener(v -> ExtraCore.setValue(ExtraConstants.LAUNCH_GAME, true));
-        }
-        mShareLogsButton.setOnClickListener((v) -> shareLog(requireContext()));
-
-        mOpenDirectoryButton.setOnClickListener((v)-> {
-            Tools.switchDemo(Tools.isDemoProfile(v.getContext())); // avoid switching accounts being able to access
+        mShareLogsButton.setOnClickListener(v -> shareLog(requireContext()));
+        mOpenDirectoryButton.setOnClickListener(v -> {
+            Tools.switchDemo(Tools.isDemoProfile(v.getContext()));
             openPath(v.getContext(), getCurrentProfileDirectory(), false);
         });
 
-
-        mNewsButton.setOnLongClickListener((v)->{
+        mNewsButton.setOnLongClickListener(v -> {
             Tools.swapFragment(requireActivity(), GamepadMapperFragment.class, GamepadMapperFragment.TAG, null);
             return true;
         });
+
+        // Appel asynchrone à isNewUpdate()
+        isNewUpdate(isUpdate -> {
+            requireActivity().runOnUiThread(() -> {
+                if (LauncherProfiles.mainProfileJson.profiles.isEmpty() || isUpdate) {
+                    mPlayButton.setText(R.string.update);
+                    mPlayButton.setOnClickListener(v ->
+                            Tools.swapFragment((FragmentActivity) getContext(),
+                                    SearchModFragment.class,
+                                    SearchModFragment.TAG, null)
+                    );
+                } else {
+                    mPlayButton.setText(R.string.main_play);
+                    mPlayButton.setOnClickListener(v -> ExtraCore.setValue(ExtraConstants.LAUNCH_GAME, true));
+                }
+            });
+        });
     }
+
 
     private File getCurrentProfileDirectory() {
         String currentProfile = LauncherPreferences.DEFAULT_PREF.getString(LauncherPreferences.PREF_KEY_CURRENT_PROFILE, null);
@@ -98,12 +106,7 @@ public class MainMenuFragment extends Fragment {
         mVersionSpinner.reloadProfiles();
     }
 
-    public boolean isNewUpdate()
-    {
-        return true;
-    }
-
-    private void checkForModUpdate() {
+    public void isNewUpdate(Consumer<Boolean> callback) {
         ModpackApi modpackApi = new CommonApi(getString(R.string.curseforge_api_key));
 
         SearchFilters filters = new SearchFilters();
@@ -111,24 +114,23 @@ public class MainMenuFragment extends Fragment {
         filters.name = "Pokefree";
 
         SearchResult result = modpackApi.searchMod(filters);
-            if (result == null || result == null || result.totalResultCount == 0) {
-                return;
-            }
+        if (result == null || result.totalResultCount == 0) {
+            callback.accept(false);
+            return;
+        }
 
-            String latestVersion = result.results[0].toString();
-
-            // Exemple de comparaison : tu peux adapter cette version locale
+        new SelfReferencingFuture(myFuture -> {
+            ModDetail modDetail = modpackApi.getModDetails(result.results[0]);
+            String latestVersion = modDetail.versionNames[0];
             String localVersion = getInstalledModVersion();
-
-            hasUpdate = !latestVersion.equals(localVersion);
-
-            // Reconfigurer le bouton maintenant qu’on a l’info
-            //updatePlayButton();
+            System.out.println("dif version : " + latestVersion + "----" + localVersion);
+            boolean isUpdate = !latestVersion.equals(localVersion);
+            callback.accept(isUpdate);
+        }).startOnExecutor(PojavApplication.sExecutorService);
     }
 
-
     private String getInstalledModVersion() {
-        File versionFile = new File(getCurrentProfileDirectory(), "pokefree-version.txt");
+        File versionFile = new File(Tools.DIR_GAME_HOME, "pokefree-version.txt");
         if (versionFile.exists()) {
             try {
                 return new BufferedReader(new FileReader(versionFile)).readLine();

@@ -4,13 +4,37 @@
 
     <net.kdt.pojavlaunch.prefs.BackButtonPreference/>
 
+    <PreferenceCategory
+        android:title="@string/preference_category_controller_settings"
+        >
+        <Preference
+            android:title="@string/preference_remap_controller_title"
+            android:summary="@string/preference_remap_controller_description"
+            android:fragment="net.kdt.pojavlaunch.fragments.GamepadMapperFragment"/>
+        <net.kdt.pojavlaunch.prefs.GamepadRemapPreference
+            android:title="@string/preference_wipe_controller_title"
+            android:summary="@string/preference_wipe_controller_description"
+            />
+        <net.kdt.pojavlaunch.prefs.CustomSeekBarPreference
+            android:key="gamepad_deadzone_scale"
+            android:title="@string/preference_deadzone_scale_title"
+            android:summary="@string/preference_deadzone_scale_description"
+            app2:showSeekBarValue="true"
+            app2:min="@integer/gamepad_deadzone_seekbar_min"
+            android:max="@integer/gamepad_deadzone_seekbar_max"
+            app2:seekBarIncrement="@integer/gamepad_deadzone_seekbar_increment"
+            />
+
+    </PreferenceCategory>
 
     <Preference
         android:title="@string/preference_edit_controls_title"
         android:summary="@string/preference_edit_controls_summary"
-        app2:icon="@drawable/ic_menu_custom_controls"
-        >
-        <intent android:targetPackage="@string/application_package" android:targetClass="net.kdt.pojavlaunch.CustomControlsActivity" android:action=".CustomControlsActivity"/>
+        app2:icon="@drawable/ic_menu_custom_controls">
+
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="net.kdt.pojavlaunch.CustomControlsActivity" />
     </Preference>
 
     <PreferenceCategory
@@ -138,29 +162,6 @@
             android:key="gyroInvertY"
             android:title="@string/preference_gyro_invert_y_axis"
             android:summary="@string/preference_gyro_invert_y_axis_description"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/preference_category_controller_settings"
-        >
-        <Preference
-            android:title="@string/preference_remap_controller_title"
-            android:summary="@string/preference_remap_controller_description"
-            android:fragment="net.kdt.pojavlaunch.fragments.GamepadMapperFragment"/>
-        <net.kdt.pojavlaunch.prefs.GamepadRemapPreference
-            android:title="@string/preference_wipe_controller_title"
-            android:summary="@string/preference_wipe_controller_description"
-            />
-        <net.kdt.pojavlaunch.prefs.CustomSeekBarPreference
-            android:key="gamepad_deadzone_scale"
-            android:title="@string/preference_deadzone_scale_title"
-            android:summary="@string/preference_deadzone_scale_description"
-            app2:showSeekBarValue="true"
-            app2:min="@integer/gamepad_deadzone_seekbar_min"
-            android:max="@integer/gamepad_deadzone_seekbar_max"
-            app2:seekBarIncrement="@integer/gamepad_deadzone_seekbar_increment"
-            />
 
     </PreferenceCategory>
 

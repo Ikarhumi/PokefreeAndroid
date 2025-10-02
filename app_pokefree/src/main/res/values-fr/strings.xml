@@ -185,7 +185,7 @@
     <string name="preference_force_vsync_description">Limiter la baisse de performance thermique (chauffe) en limitant les performances maximales.</string>
     <string name="preference_force_english_title">Forcer la langue en anglais</string>
     <string name="preference_force_english_description">Permet de voir les chaînes de caractères originales, telles qu\'elles ont été conçues par les développeurs. Nécessite un redémarrage.</string>
-    <string name="preference_edit_controls_title">Modifier les contrôles personnalisés</string>
+    <string name="preference_edit_controls_title">Importer un fichier contrôle manette</string>
     <string name="preference_edit_controls_summary">Ajuster le schéma de contrôles pour répondre à vos besoins.</string>
     <string name="preference_category_gyro_controls">Contrôles gyroscopiques</string>
     <string name="preference_category_virtual_mouse">Souris virtuelle</string>
@@ -240,7 +240,7 @@
     <string name="storage_required">PojavLauncher nécessite que le stockage externe soit connecté. Veuillez le reconnecter et redémarrer l\'application.</string>
     <string name="mcl_setting_title_buttonallcaps">N\'utilisez que des lettres majuscules dans les libellés des boutons</string>
     <string name="mcl_setting_subtitle_buttonallcaps">Désactivez cette option si vous souhaitez utiliser des lettres minuscules dans vos contrôles.</string>
-    <string name="create_profile">Créer un nouveau profil</string>
+    <string name="search_update">Chercher une mise à jour</string>
     <string name="preference_shader_dump_title">Activer le dumping du shader</string>
     <string name="preference_shader_dump_description">Enregistre les shaders convertis dans le fichier journal.</string>
     <string name="percent_format">%d%%</string>
@@ -253,7 +253,7 @@
     <string name="global_no">Non</string>
     <string name="preference_controller_map_wiped">La configuration du contrôleur a été effacée.</string>
     <string name="preference_category_controller_settings">Paramètres du contrôleur</string>
-    <string name="preference_wipe_controller_title">Réinitialiser le mapping du contrôleur</string>
+    <string name="preference_wipe_controller_title">Réinitialiser la configuration manette</string>
     <string name="preference_wipe_controller_description">Permet de réaffecter les boutons du contrôleur.</string>
     <string name="preference_deadzone_scale_title">Échelle de la zone morte du joystick</string>
     <string name="preference_deadzone_scale_description">Augmentez-le si le joystick dérive.</string>
@@ -284,7 +284,7 @@
     <string name="hint_search_modpack">Rechercher des modpacks</string>
     <string name="preference_vulkan_driver_system_title">Utiliser le pilote Vulkan du système</string>
     <string name="preference_vulkan_driver_system_description">Force le launcher à utiliser le pilote Vulkan du système au lieu de Turnip sur les GPU Adreno. N\'affecte que Zink et les mods qui utilisent Vulkan.</string>
-    <string name="generic_install">Installer</string>
+    <string name="generic_install">Mettre à jour</string>
     <string name="generic_apply">Appliquer</string>
     <string name="generic_debug">Débog.</string>
     <string name="search_modpack_no_result">Aucun modpack trouvé</string>
